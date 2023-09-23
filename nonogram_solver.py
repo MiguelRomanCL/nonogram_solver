@@ -17,6 +17,28 @@ class NonoGramBoard:
             for _ in range(self.number_of_rows)
         ]
 
+    def board_is_complete(self):
+        """Check if all cells of the board are non-null."""
+        return all(cell is not None for row in self.board for cell in row)
+
+    def board_is_congruent(self):
+        # Verify every row against hints
+        all_rows_valid = all(
+            self.is_valid_line(self.board[i], self.row_hints[i])
+            for i in range(self.number_of_rows)
+        )
+
+        # Verify every column against hints
+        all_cols_valid = all(
+            self.is_valid_line(
+                [self.board[j][i] for j in range(self.number_of_rows)],
+                self.col_hints[i],
+            )
+            for i in range(self.number_of_columns)
+        )
+
+        return all_rows_valid and all_cols_valid
+
     @staticmethod
     def find_common_positions(strings):
         length = len(strings[0])
@@ -137,6 +159,17 @@ class NonoGramBoard:
     def solve_board(self, verbose=True):
         iterations = 0
         while True:
+            # Check if the board is complete and correct
+            if self.board_is_complete():
+                if self.board_is_congruent():
+                    if verbose:
+                        print(f"Solved the puzzle in {iterations} iterations.")
+                        self.show_board()
+                    return
+                else:
+                    raise IncongruentBoard(
+                        "The board with the given hints cannot exist."
+                    )
             iterations += 1
             # Create a deep copy of the current board
             board_copy = [row.copy() for row in self.board]
@@ -151,28 +184,3 @@ class NonoGramBoard:
                 raise AlgorithmStuckException(
                     "The algorithm is stuck and unable to progress further."
                 )
-
-            # Check if the board is completely filled
-            if all(cell is not None for row in self.board for cell in row):
-                # Verify every row and column against hints
-                all_rows_valid = all(
-                    self.is_valid_line(self.board[i], self.row_hints[i])
-                    for i in range(self.number_of_rows)
-                )
-                all_cols_valid = all(
-                    self.is_valid_line(
-                        [self.board[j][i] for j in range(self.number_of_rows)],
-                        self.col_hints[i],
-                    )
-                    for i in range(self.number_of_columns)
-                )
-
-                if all_rows_valid and all_cols_valid:
-                    if verbose:
-                        print(f"Solved the puzzle in {iterations} iterations.")
-                        self.show_board()
-                    return
-                else:
-                    raise AlgorithmStuckException(
-                        "The board is filled but does not match the given hints."
-                    )
