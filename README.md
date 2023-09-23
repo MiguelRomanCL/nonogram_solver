@@ -15,5 +15,6 @@ col_hints = [[1], [1, 1], [1, 3], [3, 1], [2]]
 nonogram = NonoGramBoard(row_hints, col_hints)
 
 # Solve the nonogram
-nonogram.solve(verbose=True)
+nonogram.solve_board(verbose=True)
 ```
+
