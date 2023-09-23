@@ -116,7 +116,7 @@ class NonoGramBoard:
                 if value is not None:
                     self.board[index][indice_columnas] = value
 
-    def mostrar_tablero(self):
+    def show_board(self):
         for fila in self.board:
             print(" ".join(["#" if c == 1 else "." if c == 0 else "?" for c in fila]))
 
@@ -170,7 +170,7 @@ class NonoGramBoard:
                 if all_rows_valid and all_cols_valid:
                     if verbose:
                         print(f"Solved the puzzle in {iterations} iterations.")
-                        self.mostrar_tablero()
+                        self.show_board()
                     return
                 else:
                     raise AlgorithmStuckException(
