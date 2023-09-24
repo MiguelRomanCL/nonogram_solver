@@ -1,5 +1,11 @@
+import tkinter as tk
 from main_application import MainApplication
 
-if __name__ == "__main__":
+
+def main():
     root = MainApplication()
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

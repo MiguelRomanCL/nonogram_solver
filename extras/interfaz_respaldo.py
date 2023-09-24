@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
-from nonogram_solver import NonoGramBoard
+from src.nonogram_solver import NonoGramBoard
 import copy
 
 

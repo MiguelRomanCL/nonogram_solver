@@ -1,28 +1,137 @@
 import tkinter as tk
-from nonogram_solver import NonoGramBoard
-from tkinter import messagebox
+from tkinter import simpledialog, messagebox
+from src.nonogram_solver import NonoGramBoard
 import copy
 
 
-class NonoGramGUI(tk.Tk):
-    def __init__(self, board: NonoGramBoard):
+class MainApplication(tk.Tk):
+    def __init__(self):
         super().__init__()
-        self.board = board
-        self.title("NonoGram")
+        self.title("NonoGram Start")
+        self.geometry("300x100")
 
-        self.number_of_rows = board.number_of_rows
-        self.number_of_columns = board.number_of_columns
+        self.label = tk.Label(self, text="Welcome to NonoGram!")
+        self.label.pack(pady=20)
 
-        # Create a separate board instance for solving
-        solve_board_instance = NonoGramBoard(board.row_hints, board.col_hints)
+        self.start_button = tk.Button(self, text="Start", command=self.start)
+        self.start_button.pack(pady=10)
+
+    def start(self):
+        self.destroy()
+        input_hints = InputHints(self)
+        input_hints.mainloop()
+
+
+class InputHints(tk.Tk):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.title("Input Hints")
+
+        self.row_var = tk.StringVar()
+        self.column_var = tk.StringVar()
+
+        self.label1 = tk.Label(self, text="Number of Rows:")
+        self.label1.grid(row=0, column=0, padx=20, pady=(20, 0))
+
+        self.row_entry = tk.Entry(self, textvariable=self.row_var)
+        self.row_entry.grid(row=1, column=0, padx=20, pady=(0, 20))
+
+        self.label2 = tk.Label(self, text="Number of Columns:")
+        self.label2.grid(row=0, column=1, padx=20, pady=(20, 0))
+
+        self.column_entry = tk.Entry(self, textvariable=self.column_var)
+        self.column_entry.grid(row=1, column=1, padx=20, pady=(0, 20))
+
+        self.submit_button = tk.Button(self, text="Next", command=self.create_hint_grid)
+        self.submit_button.grid(row=2, column=0, columnspan=2, pady=20)
+
+    def create_hint_grid(self):
         try:
-            solve_board_instance.solve_board(verbose=False)
-            # Make a deep copy of the solved board
-            self.solved_board = copy.deepcopy(solve_board_instance.board)
+            number_of_rows = int(self.row_var.get())
+            number_of_columns = int(self.column_var.get())
+
+            for widget in self.winfo_children():
+                widget.destroy()
+
+            self.entries = []
+
+            for i in range(number_of_rows):
+                entry = tk.Entry(self)
+                entry.grid(row=i, column=0, padx=10, pady=10)
+                self.entries.append(entry)
+
+            for j in range(number_of_columns):
+                entry = tk.Entry(self)
+                entry.grid(row=number_of_rows, column=j + 1, padx=10, pady=10)
+                self.entries.append(entry)
+
+            self.submit_hints_button = tk.Button(
+                self,
+                text="Submit Hints",
+                command=lambda: self.submit_hints(number_of_rows, number_of_columns),
+            )
+            self.submit_hints_button.grid(
+                row=number_of_rows + 1,
+                column=0,
+                columnspan=number_of_columns + 1,
+                pady=20,
+            )
+
+        except ValueError:
+            messagebox.showerror(
+                "Error", "Please enter valid numbers for rows and columns."
+            )
+
+    def submit_hints(self, number_of_rows, number_of_columns):
+        try:
+            row_hints = [
+                list(map(int, entry.get().split(",")))
+                for entry in self.entries[:number_of_rows]
+            ]
+            col_hints = [
+                list(map(int, entry.get().split(",")))
+                for entry in self.entries[number_of_rows:]
+            ]
+
+            nonogram = NonoGramBoard(row_hints, col_hints)
+            try:
+                nonogram.solve_board(verbose=False)
+                self.destroy()
+                app = NonoGramGUI(nonogram)
+                app.mainloop()
+            except Exception as e:
+                messagebox.showwarning(
+                    "Warning",
+                    f"The board is impossible to create due to {str(e)}.\nPlease provide valid hints.",
+                )
+                return
+
+        except ValueError:
+            messagebox.showerror(
+                "Error",
+                "Please enter valid hints. Use ',' to separate hints for a row or column.",
+            )
+
+
+class NonoGramGUI(tk.Frame):
+    def __init__(self, parent, board):
+        super().__init__(parent)
+        self.parent = parent
+        self.board = board
+        self.original_board = copy.deepcopy(board)
+        self.pack(fill=tk.BOTH, expand=True)
+
+        # Attempt to solve the board and store the solution
+        try:
+            self.solved_board = copy.deepcopy(self.board.board)
+            self.board.solve_board(verbose=False)
         except Exception as e:
             print(f"Alert: The board is {str(e)}")
             self.solved_board = None
 
+        self.number_of_rows = board.number_of_rows
+        self.number_of_columns = board.number_of_columns
         self.buttons = [
             [None for _ in range(self.number_of_columns)]
             for _ in range(self.number_of_rows)
@@ -81,6 +190,14 @@ class NonoGramGUI(tk.Tk):
             columnspan=self.number_of_columns // 2,
         )
 
+        reset_board_btn = tk.Button(self, text="Reset Board", command=self.reset_board)
+        reset_board_btn.grid(
+            row=self.number_of_rows + 2,
+            column=0,
+            pady=10,
+            columnspan=self.number_of_columns + 1,
+        )
+
     def mark_square(self, x: int, y: int, value: int):
         self.board.board[x][y] = value
         self.update_button_color(x, y)
@@ -119,14 +236,15 @@ class NonoGramGUI(tk.Tk):
             for j in range(self.number_of_columns):
                 self.update_button_color(i, j)
 
+    def reset_board(self):
+        self.board.board = [row.copy() for row in self.original_board.board]
+        for i in range(self.number_of_rows):
+            for j in range(self.number_of_columns):
+                self.update_button_color(i, j)
 
-if __name__ == "__main__":
-    # Example usage
-    row_hints = [[7], [8], [4, 2], [4, 3], [3, 4], [4], [4], [4], [5], [3]]
-    col_hints = [[2], [3, 1], [4, 2], [4, 3], [3, 4], [2, 4], [2, 4], [2, 4], [6], [5]]
 
-    # Example usage
-    nonogram = NonoGramBoard(row_hints, col_hints)
-
-    app = NonoGramGUI(nonogram)
-    app.mainloop()
+# When starting the app:
+root = tk.Tk()
+root.title("NonoGram")
+app = MainApplication()
+root.mainloop()

@@ -12,10 +12,11 @@ class NonoGramGUI(tk.Frame):
         self.original_board = copy.deepcopy(board)
         self.pack(fill=tk.BOTH, expand=True)
 
-        # Attempt to solve the board and store the solution
+        # Intentamos resolver una copia del tablero y almacenar la solución
         try:
-            self.solved_board = copy.deepcopy(self.board.board)
-            self.board.solve_board(verbose=False)
+            self.solved_board_instance = copy.deepcopy(self.board)
+            self.solved_board_instance.solve_board(verbose=False)
+            self.solved_board = self.solved_board_instance.board
         except Exception as e:
             messagebox.showerror("Error", f"Error while solving the board: {str(e)}")
             self.solved_board = None
@@ -89,7 +90,10 @@ class NonoGramGUI(tk.Frame):
         )
 
     def mark_square(self, x, y, value):
-        self.board.board[x][y] = value
+        if self.board.board[x][y] == value:
+            self.board.board[x][y] = None
+        else:
+            self.board.board[x][y] = value
         self.update_button_color(x, y)
 
     def update_button_color(self, x, y):
@@ -132,7 +136,7 @@ class NonoGramGUI(tk.Frame):
                 self.update_button_color(i, j)
 
     def reset_board(self):
-        self.board.board = copy.deepcopy(self.original_board)
         for i in range(self.number_of_rows):
             for j in range(self.number_of_columns):
+                self.board.board[i][j] = None
                 self.update_button_color(i, j)
