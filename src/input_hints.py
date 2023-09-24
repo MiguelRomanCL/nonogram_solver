@@ -107,12 +107,19 @@ class InputHints(tk.Frame):
                 )
                 return
 
-        # Crear una instancia de NonoGramBoard con los hints proporcionados
-        board = NonoGramBoard(row_hints, col_hints)
+        # Crear una nueva instancia de NonoGramBoard para validar
+        validation_board = NonoGramBoard(row_hints, col_hints)
 
-        # Destruir todos los widgets de InputHints
+        # Validar si el tablero puede ser resuelto
+        try:
+            validation_board.solve_board(verbose=False)
+        except Exception as e:
+            tk.messagebox.showerror(
+                "Error", f"The board can't be solved. Please check your hints."
+            )
+            return
+
+        # Si todo está bien, destruir todos los widgets de InputHints y lanzar la ventana del tablero
         for widget in self.winfo_children():
             widget.destroy()
-
-        # Lanzar la ventana del tablero
-        self.board_gui = NonoGramGUI(self.parent, board)
+        self.board_gui = NonoGramGUI(self.parent, NonoGramBoard(row_hints, col_hints))
