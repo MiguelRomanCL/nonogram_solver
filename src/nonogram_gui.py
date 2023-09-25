@@ -30,6 +30,7 @@ class NonoGramGUI(tk.Frame):
 
         self.create_widgets()
         self.create_solution_buttons()
+        self.create_go_back_button()
 
     def create_widgets(self):
         for j, col_hint in enumerate(self.board.col_hints):
@@ -140,3 +141,26 @@ class NonoGramGUI(tk.Frame):
             for j in range(self.number_of_columns):
                 self.board.board[i][j] = None
                 self.update_button_color(i, j)
+
+    def go_back(self):
+        # Destroy the current GUI elements
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Go back to the initial menu or start the application from scratch
+        self.parent.destroy()
+
+        from main_application import MainApplication  # Import inside the function
+
+        root = tk.Tk()
+        app = MainApplication(root)
+        root.mainloop()
+
+    def create_go_back_button(self):
+        go_back_button = tk.Button(self, text="Go Back", command=self.go_back)
+        go_back_button.grid(
+            row=self.number_of_rows + 3,
+            column=0,
+            pady=10,
+            columnspan=self.number_of_columns + 1,
+        )
