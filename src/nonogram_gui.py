@@ -143,18 +143,9 @@ class NonoGramGUI(tk.Frame):
                 self.update_button_color(i, j)
 
     def go_back(self):
-        # Destroy the current GUI elements
-        for widget in self.winfo_children():
+        for widget in self.parent.winfo_children():
             widget.destroy()
-
-        # Go back to the initial menu or start the application from scratch
-        self.parent.destroy()
-
-        from main_application import MainApplication  # Import inside the function
-
-        root = tk.Tk()
-        app = MainApplication(root)
-        root.mainloop()
+        self.parent.show_welcome_screen()
 
     def create_go_back_button(self):
         go_back_button = tk.Button(self, text="Go Back", command=self.go_back)
