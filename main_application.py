@@ -9,13 +9,13 @@ class MainApplication(tk.Tk):
         super().__init__()
         self.title("NonoGram - Welcome")
 
-        # Creando el mensaje de bienvenida
+        # Creating the welcome message
         self.welcome_label = tk.Label(
             self, text="Welcome to NonoGram!", font=("Arial", 24), pady=20
         )
         self.welcome_label.pack(pady=20)
 
-        # Ajustando el botón "Start"
+        # Setting up the "Start" button
         self.start_button = tk.Button(
             self, text="Start", command=self.launch_input_hints, font=("Arial", 16)
         )
@@ -27,7 +27,7 @@ class MainApplication(tk.Tk):
         self.input_hints = InputHints(self)
 
     def show_welcome_screen(self):
-        """Muestra la pantalla de bienvenida con el botón Start."""
+        """Display the welcome screen with the Start button."""
         self.welcome_label = tk.Label(
             self, text="Welcome to NonoGram!", font=("Arial", 24), pady=20
         )

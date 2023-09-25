@@ -12,7 +12,7 @@ class NonoGramGUI(tk.Frame):
         self.original_board = copy.deepcopy(board)
         self.pack(fill=tk.BOTH, expand=True)
 
-        # Intentamos resolver una copia del tablero y almacenar la solución
+        # Try to solve a copy of the board and store the solution
         try:
             self.solved_board_instance = copy.deepcopy(self.board)
             self.solved_board_instance.solve_board(verbose=False)

@@ -1,20 +1,14 @@
+
 # Nonogram Solver
+A deterministic nonogram solver implemented in Python. This solver leverages the intersections of potential solutions to deduce cell values.
 
-A deterministic nonogram solver implemented in Python. This solver uses the intersections of possible solutions to determine cell values.
-
-## Usage
-
-```python
-from nonogram_solver import NonoGramBoard
-
-# Define hints for rows and columns
-row_hints = [[5], [2], [2], [2], [2]]
-col_hints = [[1], [1, 1], [1, 3], [3, 1], [2]]
-
-# Create an instance of the solver
-nonogram = NonoGramBoard(row_hints, col_hints)
-
-# Solve the nonogram
-nonogram.solve_board(verbose=True)
-```
+# Version 2.0 Updates
+Introduced a Graphical User Interface (GUI) using tkinter.
+Users can select the board dimensions and subsequently input the hints for both columns and rows.
+Upon board creation, the interface checks for board congruence.
+In-game functionalities include:
+View Full Solution: Displays the entire solution to the puzzle.
+Verify User's Solution: Checks the correctness of the user's input against the actual solution.
+Reset Board: Clears the current board state, allowing users to start over.
+Return to Main Menu: Navigate back to the starting screen.
 

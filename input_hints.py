@@ -9,7 +9,7 @@ class InputHints(tk.Frame):
         self.parent = parent
         self.pack(fill=tk.BOTH, expand=True)
 
-        # Solicitando las dimensiones del tablero
+        # Requesting board dimensions
         self.row_label = tk.Label(self, text="Number of Rows:")
         self.row_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
         self.row_entry = tk.Entry(self)
@@ -24,7 +24,7 @@ class InputHints(tk.Frame):
         self.submit_button.grid(row=2, column=0, columnspan=2, pady=20)
 
     def get_dimensions(self):
-        # Obtener las dimensiones ingresadas
+        # Get the entered dimensions
         try:
             self.number_of_rows = int(self.row_entry.get())
             self.number_of_columns = int(self.col_entry.get())
@@ -34,23 +34,23 @@ class InputHints(tk.Frame):
             )
             return
 
-        # Destruir widgets existentes
+        # Destroy existing widgets
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Llamamos al método para generar los campos de entrada de hints
+        # Call the method to generate the hint input fields
         self.generate_hint_inputs()
 
     def generate_hint_inputs(self):
-        # Generar campos de entrada para hints de fila
+        # Generate input fields for row hints
         for i in range(self.number_of_rows):
             label = tk.Label(self, text=f"Row {i+1} Hints:")
             label.grid(row=i, column=0, padx=10, pady=5, sticky=tk.W)
             entry = tk.Entry(self)
             entry.grid(row=i, column=1, padx=10, pady=5)
-            # Podemos almacenar estos widgets en listas si necesitamos referenciarlos más tarde
+            # We can store these widgets in lists if we need to reference them later
 
-        # Generar campos de entrada para hints de columna
+        # Generate input fields for column hints
         for j in range(self.number_of_columns):
             label = tk.Label(self, text=f"Column {j+1} Hints:")
             label.grid(
@@ -58,9 +58,9 @@ class InputHints(tk.Frame):
             )
             entry = tk.Entry(self)
             entry.grid(row=self.number_of_rows + j, column=1, padx=10, pady=5)
-            # Al igual que antes, podemos almacenar estos widgets en listas
+            # Just like before, we can store these widgets in lists
 
-        # Botón "Finalizar"
+        # "Finish" button
         finish_button = tk.Button(self, text="Create Board", command=self.finish_setup)
         finish_button.grid(
             row=self.number_of_rows + self.number_of_columns + 1,
@@ -70,18 +70,18 @@ class InputHints(tk.Frame):
         )
 
     def finish_setup(self):
-        # Recopilar los hints ingresados
+        # Gather the entered hints
         row_hints = []
         col_hints = []
 
-        # Para los hints de fila
+        # For row hints
         for i in range(self.number_of_rows):
             entry = self.grid_slaves(row=i, column=1)[
                 0
-            ]  # Obtener el Entry widget correspondiente
+            ]  # Get the corresponding Entry widget
             hints = (
                 entry.get().split()
-            )  # Asumimos que los hints se ingresan separados por espacios
+            )  # We assume hints are entered separated by spaces
             try:
                 row_hints.append([int(hint) for hint in hints])
             except ValueError:
@@ -90,14 +90,14 @@ class InputHints(tk.Frame):
                 )
                 return
 
-        # Para los hints de columna
+        # For column hints
         for j in range(self.number_of_columns):
             entry = self.grid_slaves(row=self.number_of_rows + j, column=1)[
                 0
-            ]  # Obtener el Entry widget correspondiente
+            ]  # Get the corresponding Entry widget
             hints = (
                 entry.get().split()
-            )  # Asumimos que los hints se ingresan separados por espacios
+            )  # We assume hints are entered separated by spaces
             try:
                 col_hints.append([int(hint) for hint in hints])
             except ValueError:
@@ -107,10 +107,10 @@ class InputHints(tk.Frame):
                 )
                 return
 
-        # Crear una nueva instancia de NonoGramBoard para validar
+        # Create a new instance of NonoGramBoard for validation
         validation_board = NonoGramBoard(row_hints, col_hints)
 
-        # Validar si el tablero puede ser resuelto
+        # Validate if the board can be solved
         try:
             validation_board.solve_board(verbose=False)
         except Exception as e:
@@ -119,7 +119,7 @@ class InputHints(tk.Frame):
             )
             return
 
-        # Si todo está bien, destruir todos los widgets de InputHints y lanzar la ventana del tablero
+        # If everything is good, destroy all InputHints widgets and launch the board window
         for widget in self.winfo_children():
             widget.destroy()
         self.board_gui = NonoGramGUI(self.parent, NonoGramBoard(row_hints, col_hints))
